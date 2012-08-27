@@ -4,7 +4,7 @@ DIALOG=kdialog
 
 TERMINAL=konsole
 
-RSYNC=rsync
+RSYNC="rsync"
 
 DEST=/media/something
 
