@@ -1,11 +1,46 @@
 #!/bin/sh
 
-DIALOG=kdialog
+# Usage: backup.sh [<backup_device> [system_id]]
 
-TERMINAL=konsole
+# File (flag) on backup device to make sure we're not backing up
+# where we're not supposed to (that file has to be present at the 
+# / of the device)
 
-RSYNC="rsync"
+BACKUP_STAMP_FILE="backup_target"
 
-DEST=/media/something
+# Where do we mount device for backup
+MNT_PNT=${1:-"/media/BACKUP"}
+# ID for the system running backup
+SYSTEM_ID=${2:-"E4300"}
 
-$TERMINAL -e "${RSYNC} $@ ${DEST}"
+DATESTAMP=$(date "+%Y-%m-%d-%H:%M")
+
+# files we'll exclude from the backup (full path)
+EXCLUDES="/backup_excludes"
+
+BACKUP_BASE=${MNT_PNT}/${SYSTEM_ID}
+
+# Backup log file
+LOG_FILE="/var/log/system_backup.log"
+
+PATH=${PATH}:/sbin:/bin:/usr/bin:/usr/sbin
+
+run_backup(){ 
+  rsync -a --stats --link-dest=${BACKUP_BASE}/last --exclude-from=${BACKUP_BASE}/${EXCLUDES} \
+        --log-file=${LOG_FILE} \
+        / ${BACKUP_BASE}/${DATESTAMP}
+  ( cd ${BACKUP_BASE} && unlink last && ln -sf ${DATESTAMP} last )
+}
+
+
+if [ -e $"${MNT_PNT}/${BACKUP_STAMP_FILE}" ]
+ then
+  if [ -d $"${BACKUP_BASE}" ]
+   then
+     run_backup
+   else 
+     echo "No backup base directory exists. bailing"
+  fi
+ else
+  echo "No backup stamp found"
+fi
