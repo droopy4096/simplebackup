@@ -1,0 +1,13 @@
+[Desktop Action open]
+# Needs to be deployed into $HOME/.kde/share/apps/solid/actions/
+Exec=kdialog --yesno 'Satisfied?'
+Icon=drive-removable-media-usb
+Name=Backup
+Name[ru]=Резервная копия
+Name[ua]=Зберегти копiю
+
+[Desktop Entry]
+Actions=open;
+Type=Service
+X-KDE-Action-Custom=true
+X-KDE-Solid-Predicate=[[[[StorageVolume.usage == 'FileSystem' AND StorageVolume.label  & 'BACKUP'] AND StorageVolume.ignored == 'false'] OR [IS StorageAccess AND StorageDrive.driveType == 'Floppy']] OR StorageAccess.accessible == 'false']
