@@ -13,23 +13,39 @@ MNT_PNT=${1:-"/media/BACKUP"}
 # ID for the system running backup
 SYSTEM_ID=${2:-"E4300"}
 
-DATESTAMP=$(date "+%Y-%m-%d-%H:%M")
+DATESTAMP=$(date "+%Y-%m-%d_%H-%M")
 
 # files we'll exclude from the backup (full path)
-EXCLUDES="/backup_excludes"
+EXCLUDES="backup_excludes"
+FILTER="backup_filter"
 
+BACKUP_THIS=$HOME
 BACKUP_BASE=${MNT_PNT}/${SYSTEM_ID}
 
 # Backup log file
-LOG_FILE="/var/log/system_backup.log"
+# LOG_FILE="/var/log/system_backup.log"
+LOG_FILE="$HOME/system_backup.log"
 
 PATH=${PATH}:/sbin:/bin:/usr/bin:/usr/sbin
 
 run_backup(){ 
-  rsync -a --stats --link-dest=${BACKUP_BASE}/last --exclude-from=${BACKUP_BASE}/${EXCLUDES} \
-        --log-file=${LOG_FILE} \
-        / ${BACKUP_BASE}/${DATESTAMP}
-  ( cd ${BACKUP_BASE} && unlink last && ln -sf ${DATESTAMP} last )
+  if kdialog --title "Backup warning" --yesno "Are you ready to perform backup to $MNT_PNT?"
+  then
+      dbusRef=$(kdialog --progressbar "Backup progress" 3)
+      qdbus $dbusRef Set "" value 1
+      qdbus $dbusRef setLabelText "Backing up"
+      # rsync -a --stats --link-dest=${BACKUP_BASE}/last --filter="merge ${BACKUP_BASE}/${FILTER}" \
+      rsync -a --stats --filter="merge ${BACKUP_BASE}/${FILTER}" \
+            --log-file=${LOG_FILE} \
+            ${BACKUP_THIS}/ ${BACKUP_BASE}/${DATESTAMP}
+      qdbus $dbusRef Set "" value 2
+      qdbus $dbusRef setLabelText "Linking"
+      ( cd ${BACKUP_BASE} && unlink last && ln -sf ${DATESTAMP} last )
+      qdbus $dbusRef Set "" value 3
+      qdbus $dbusRef setLabelText "Done"
+      qdbus $dbusRef close
+      kdialog --msgbox "Backup finished.\nUnmount $MNT_PNT"
+  fi
 }
 
 
@@ -39,8 +55,8 @@ if [ -e $"${MNT_PNT}/${BACKUP_STAMP_FILE}" ]
    then
      run_backup
    else 
-     echo "No backup base directory exists. bailing"
+     kdialog --error "No backup base directory exists. bailing"
   fi
  else
-  echo "No backup stamp found"
+  kdialog --error "No backup stamp found"
 fi

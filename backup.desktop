@@ -1,6 +1,5 @@
 [Desktop Action open]
-# Needs to be deployed into $HOME/.kde/share/apps/solid/actions/
-Exec=kdialog --yesno 'Satisfied?'
+Exec=/home/dimon/work/shell/simplebackup/backup.sh
 Icon=drive-removable-media-usb
 Name=Backup
 Name[ru]=Резервная копия
@@ -10,4 +9,5 @@ Name[ua]=Зберегти копiю
 Actions=open;
 Type=Service
 X-KDE-Action-Custom=true
+# X-KDE-Solid-Predicate=[[[[StorageVolume.ignored == 'false' AND StorageVolume.usage == 'FileSystem'] OR [IS StorageAccess AND StorageDrive.driveType == 'Floppy']] OR StorageAccess.accessible == 'false'] AND StorageVolume.label  & 'BACKUP']
 X-KDE-Solid-Predicate=[[[[StorageVolume.usage == 'FileSystem' AND StorageVolume.label  & 'BACKUP'] AND StorageVolume.ignored == 'false'] OR [IS StorageAccess AND StorageDrive.driveType == 'Floppy']] OR StorageAccess.accessible == 'false']
