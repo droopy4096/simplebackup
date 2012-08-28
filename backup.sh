@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This script requires KDE environment. Namely - kdialog
+
 # Usage: backup.sh [<backup_device> [system_id]]
 
 # File (flag) on backup device to make sure we're not backing up
