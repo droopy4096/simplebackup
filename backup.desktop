@@ -1,9 +1,9 @@
 [Desktop Action open]
-Exec=/home/dimon/work/shell/simplebackup/backup.sh
+Exec=/home/dimon/work/shell/simplebackup/backup.sh %f E4300
 Icon=drive-removable-media-usb
 Name=Backup
 Name[ru]=Резервная копия
-Name[ua]=Зберегти копiю
+Name[uk]=Зберегти копiю
 
 [Desktop Entry]
 Actions=open;
