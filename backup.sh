@@ -42,9 +42,10 @@ run_backup(){
       dbusRef=$(kdialog --progressbar "Backup progress" 3)
       qdbus $dbusRef Set "" value 1
       qdbus $dbusRef setLabelText "Backing up"
-      rsync -a --delete --copy-unsafe-links --stats  \
+      rsync -rKHt --numeric-ids --copy-unsafe-links --delete --stats \
+            --size-only \
             --filter="merge ${BACKUP_BASE}/${FILTER}" \
-            --log-file=${LOG_FILE} \
+            --log-file=${LOG_FILE} \ 
             ${BACKUP_THIS} ${BACKUP_BASE}
       qdbus $dbusRef Set "" value 2
       qdbus $dbusRef setLabelText "Linking"
