@@ -27,7 +27,7 @@ DATESTAMP=$(date "+%Y-%m-%d_%H-%M")
 EXCLUDES="backup_excludes"
 FILTER="backup_filter"
 
-BACKUP_THIS=$HOME
+BACKUP_THIS=$HOME /etc
 BACKUP_BASE=${MNT_PNT}/${SYSTEM_ID}
 
 # Backup log file
@@ -42,10 +42,10 @@ run_backup(){
       dbusRef=$(kdialog --progressbar "Backup progress" 3)
       qdbus $dbusRef Set "" value 1
       qdbus $dbusRef setLabelText "Backing up"
-      # rsync -a --stats --link-dest=${BACKUP_BASE}/last --filter="merge ${BACKUP_BASE}/${FILTER}" \
-      rsync -a --stats --filter="merge ${BACKUP_BASE}/${FILTER}" \
+      rsync -a --delete --copy-unsafe-links --stats  \
+            --filter="merge ${BACKUP_BASE}/${FILTER}" \
             --log-file=${LOG_FILE} \
-            ${BACKUP_THIS}/ ${BACKUP_BASE}/${DATESTAMP}
+            ${BACKUP_THIS} ${BACKUP_BASE}
       qdbus $dbusRef Set "" value 2
       qdbus $dbusRef setLabelText "Linking"
       ( cd ${BACKUP_BASE} && unlink last && ln -sf ${DATESTAMP} last )
